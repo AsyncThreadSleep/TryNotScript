@@ -12,11 +12,11 @@
 // ==/UserScript==
 
 (function () {
-    "use strict";
+  "use strict";
 
-    // CSS 样式
-    const CSS_ClassStyle = {
-        ScriptButton: `
+  // CSS 样式
+  const CSS_ClassStyle = {
+    ScriptButton: `
             width: 64px;
             height: 32px;
             border-radius: 8px;
@@ -32,7 +32,7 @@
             cursor: pointer;
             user-select: none;
         `,
-        ScriptMessage: `
+    ScriptMessage: `
             width: 128px;
             height: 32px;
             border-radius: 8px;
@@ -46,7 +46,7 @@
             top: 6px;
             left: calc(50% - 64px);
         `,
-        ScriptBox: `
+    ScriptBox: `
             width: 100px;
             height: 0px;
             border-radius: 8px;
@@ -61,7 +61,7 @@
             overflow: hidden;
             transition: height 0.5s;
         `,
-        Script_01: `
+    Script_01: `
             width: 80%;
             height: 24px;
             border: 1px solid black;
@@ -72,79 +72,82 @@
             line-height: 24px;
             text-align: center;
         `,
+  };
+
+  // 脚本容器
+  function ScriptStart() {
+    class CreateElement {
+      Element = null;
+      constructor(options = {}) {
+        const {
+          element = "div",
+          appendElement = document.body,
+          style = "",
+          innerHTML = "",
+        } = options;
+        this.Element = document.createElement(element);
+        this.Element.style = style;
+        this.Element.innerHTML = innerHTML;
+        appendElement.appendChild(this.Element);
+      }
+    }
+    // 创建TryNot按钮
+    const ScriptButton = new CreateElement({innerHTML:"TryNot",style:CSS_ClassStyle.ScriptButton});
+    ScriptButton.Element.addEventListener("click", () => {
+      ScriptBox.Element.style.height = ScriptBox.Element.style.height === "150px" ? "0px" : "150px";
+    });
+    // 创建脚本框
+    const ScriptBox = new CreateElement({style:CSS_ClassStyle.ScriptBox});
+    // 创建脚本消息框
+    const ScriptMessage = new CreateElement({style:CSS_ClassStyle.ScriptMessage});
+    function Message(msg) {
+      ScriptMessage.Element.innerHTML = msg;
+      ScriptMessage.Element.style.display = "block";
+      setTimeout(() => {
+        ScriptMessage.Element.style.display = "none";
+      }, 1500);
+    }
+    // // 创建脚本框内容 - 清除广告
+    const Script_01 = new CreateElement({appendElement:ScriptBox.Element,innerHTML:"清除广告",style:CSS_ClassStyle.Script_01});
+    Script_01.Element.addEventListener("click", () => {
+      const RemoveArray = new Array();
+
+      const mhFootHint = document.querySelectorAll(".mhFootHint");
+      const reader_cartoon_image = document.querySelectorAll(
+        ".reader-cartoon-image"
+      );
+
+      RemoveArray.push(document.querySelector(".loginbackwrap"));
+      RemoveArray.push(document.querySelector("div[data-type='1']"));
+      RemoveArray.push(document.querySelector(".div_sticky2"));
+      RemoveArray.push(mhFootHint[0]);
+      RemoveArray.push(mhFootHint[1]);
+      RemoveArray.push(reader_cartoon_image[reader_cartoon_image.length - 1]);
+
+      RemoveArray.forEach((element) => {
+        if (element) element.remove();
+      });
+
+      Message("已清除");
+    });
+    // // 创建脚本框内容 - 下一页
+    const Script_02 = new CreateElement({appendElement:ScriptBox.Element,innerHTML:"下一页",style:CSS_ClassStyle.Script_01});
+    Script_02.Element.addEventListener("click", () => {
+      const NextPage = document.querySelector(".faarrowright");
+      NextPage.click();
+    });
+  }
+
+  // 脚本运行
+  try {
+    console.log("TryNotScript: chocoi_Script Start");
+
+    window.onload = function () {
+      ScriptStart();
     };
-
-    // 脚本容器
-    function ScriptStart() {
-        // 创建TryNot按钮
-        const ScriptButton = document.createElement("div");
-        ScriptButton.innerHTML = "TryNot";
-        ScriptButton.style = CSS_ClassStyle.ScriptButton;
-        ScriptButton.addEventListener("click", () => {
-            ScriptBox.style.height = ScriptBox.style.height === "150px" ? "0px" : "150px";
-        });
-        // 创建脚本框
-        const ScriptBox = document.createElement("div");
-        ScriptBox.style = CSS_ClassStyle.ScriptBox;
-        // 创建脚本消息框
-        const ScriptMessage = document.createElement("div");
-        ScriptMessage.style = CSS_ClassStyle.ScriptMessage;
-        function Message(msg) {
-            ScriptMessage.innerHTML = msg;
-            ScriptMessage.style.display = "block";
-            setTimeout(() => {
-                ScriptMessage.style.display = "none";
-            }, 1500);
-        }
-        // 创建脚本框内容 - 清除广告
-        const Script_01 = document.createElement("div");
-        Script_01.innerHTML = "清除广告";
-        Script_01.style = CSS_ClassStyle.Script_01;
-        Script_01.addEventListener("click", () => {
-            const RemoveArray = new Array();
-
-            const mhFootHint = document.querySelectorAll(".mhFootHint");
-            const reader_cartoon_image = document.querySelectorAll(".reader-cartoon-image");
-
-            RemoveArray.push(document.querySelector(".loginbackwrap"));
-            RemoveArray.push(document.querySelector("div[data-type='1']"));
-            RemoveArray.push(document.querySelector(".div_sticky2"));
-            RemoveArray.push(mhFootHint[0]);
-            RemoveArray.push(mhFootHint[1]);
-            RemoveArray.push(reader_cartoon_image[reader_cartoon_image.length - 1]);
-
-            RemoveArray.forEach((element) => {
-                if (element) element.remove();
-            });
-
-            Message("已清除");
-        });
-        // 创建脚本框内容 - 下一页
-        const Script_02 = document.createElement("div");
-        Script_02.innerHTML = "下一页";
-        Script_02.style = CSS_ClassStyle.Script_01;
-        Script_02.addEventListener("click", () => {
-            const NextPage = document.querySelector(".faarrowright");
-            NextPage.click();
-        });
-
-        document.body.appendChild(ScriptButton);
-        document.body.appendChild(ScriptMessage);
-        document.body.appendChild(ScriptBox);
-        ScriptBox.appendChild(Script_01);
-        ScriptBox.appendChild(Script_02);
-    }
-
-    // 脚本运行
-    try {
-        console.log("TryNotScript: chocoi_Script Start");
-
-        window.onload = function () {
-            ScriptStart();
-        };
-    } catch (error) {
-        console.log("TryNotScript: chocoi_Script", error);
-    } finally {
-        console.log("TryNotScript: chocoi_Script End");
-    }
+  } catch (error) {
+    console.log("TryNotScript: chocoi_Script", error);
+  } finally {
+    console.log("TryNotScript: chocoi_Script End");
+  }
 })();
