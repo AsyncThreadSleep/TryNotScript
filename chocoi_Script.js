@@ -14,9 +14,34 @@
 (function () {
   "use strict";
 
-  // CSS 样式
-  const CSS_ClassStyle = {
-    ScriptButton: `
+  // 脚本容器
+  function ScriptStart() {
+    class CreateElement {
+      Element = null;
+      constructor(options = {}) {
+        const {
+          element = "div",
+          appendElement = document.body,
+          style = "",
+          innerHTML = "",
+          event = {
+            str: '',
+            call: null
+          }
+        } = options;
+        this.Element = document.createElement(element);
+        this.Element.style = style;
+        this.Element.innerHTML = innerHTML;
+        if(typeof event.call === 'function'){
+          this.Element.addEventListener(event.str,event.call);
+        }
+        appendElement.appendChild(this.Element);
+      }
+    }
+    // 创建TryNot按钮
+    const ScriptButton = new CreateElement({
+      innerHTML: "TryNot",
+      style: `
             width: 64px;
             height: 32px;
             border-radius: 8px;
@@ -32,21 +57,16 @@
             cursor: pointer;
             user-select: none;
         `,
-    ScriptMessage: `
-            width: 128px;
-            height: 32px;
-            border-radius: 8px;
-            background-color: rgba(255, 255, 255, 0.75);
-            font-size: 12px;
-            line-height: 32px;
-            z-index: 9999993;
-            display: none;
-            position: absolute;
-            text-align: center;
-            top: 6px;
-            left: calc(50% - 64px);
-        `,
-    ScriptBox: `
+      event: {
+        str: "click",
+        call: () => {
+          ScriptBox.Element.style.height = ScriptBox.Element.style.height === "150px" ? "0px" : "150px";
+        },
+      },
+    });
+    // 创建脚本框
+    const ScriptBox = new CreateElement({
+      style: `
             width: 100px;
             height: 0px;
             border-radius: 8px;
@@ -60,8 +80,37 @@
             align-items: center;
             overflow: hidden;
             transition: height 0.5s;
-        `,
-    Script_01: `
+        `
+    });
+    // 创建脚本消息框
+    const ScriptMessage = new CreateElement({
+      style: `
+            width: 128px;
+            height: 32px;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.75);
+            font-size: 12px;
+            line-height: 32px;
+            z-index: 9999993;
+            display: none;
+            position: absolute;
+            text-align: center;
+            top: 6px;
+            left: calc(50% - 64px);
+        `
+    });
+    function Message(msg) {
+      ScriptMessage.Element.innerHTML = msg;
+      ScriptMessage.Element.style.display = "block";
+      setTimeout(() => {
+        ScriptMessage.Element.style.display = "none";
+      }, 1500);
+    }
+    // 创建脚本框内容 - 清除广告
+    const Script_01 = new CreateElement({
+      appendElement: ScriptBox.Element,
+      innerHTML: "清除广告",
+      style: `
             width: 80%;
             height: 24px;
             border: 1px solid black;
@@ -72,69 +121,55 @@
             line-height: 24px;
             text-align: center;
         `,
-  };
+      event: {
+        str: "click",
+        call: () => {
+          const RemoveArray = new Array();
 
-  // 脚本容器
-  function ScriptStart() {
-    class CreateElement {
-      Element = null;
-      constructor(options = {}) {
-        const {
-          element = "div",
-          appendElement = document.body,
-          style = "",
-          innerHTML = "",
-        } = options;
-        this.Element = document.createElement(element);
-        this.Element.style = style;
-        this.Element.innerHTML = innerHTML;
-        appendElement.appendChild(this.Element);
-      }
-    }
-    // 创建TryNot按钮
-    const ScriptButton = new CreateElement({innerHTML:"TryNot",style:CSS_ClassStyle.ScriptButton});
-    ScriptButton.Element.addEventListener("click", () => {
-      ScriptBox.Element.style.height = ScriptBox.Element.style.height === "150px" ? "0px" : "150px";
+          const mhFootHint = document.querySelectorAll(".mhFootHint");
+          const reader_cartoon_image = document.querySelectorAll(
+            ".reader-cartoon-image"
+          );
+
+          RemoveArray.push(document.querySelector(".loginbackwrap"));
+          RemoveArray.push(document.querySelector("div[data-type='1']"));
+          RemoveArray.push(document.querySelector(".div_sticky2"));
+          RemoveArray.push(mhFootHint[0]);
+          RemoveArray.push(mhFootHint[1]);
+          RemoveArray.push(
+            reader_cartoon_image[reader_cartoon_image.length - 1]
+          );
+
+          RemoveArray.forEach((element) => {
+            if (element) element.remove();
+          });
+
+          Message("已清除");
+        },
+      },
     });
-    // 创建脚本框
-    const ScriptBox = new CreateElement({style:CSS_ClassStyle.ScriptBox});
-    // 创建脚本消息框
-    const ScriptMessage = new CreateElement({style:CSS_ClassStyle.ScriptMessage});
-    function Message(msg) {
-      ScriptMessage.Element.innerHTML = msg;
-      ScriptMessage.Element.style.display = "block";
-      setTimeout(() => {
-        ScriptMessage.Element.style.display = "none";
-      }, 1500);
-    }
-    // // 创建脚本框内容 - 清除广告
-    const Script_01 = new CreateElement({appendElement:ScriptBox.Element,innerHTML:"清除广告",style:CSS_ClassStyle.Script_01});
-    Script_01.Element.addEventListener("click", () => {
-      const RemoveArray = new Array();
-
-      const mhFootHint = document.querySelectorAll(".mhFootHint");
-      const reader_cartoon_image = document.querySelectorAll(
-        ".reader-cartoon-image"
-      );
-
-      RemoveArray.push(document.querySelector(".loginbackwrap"));
-      RemoveArray.push(document.querySelector("div[data-type='1']"));
-      RemoveArray.push(document.querySelector(".div_sticky2"));
-      RemoveArray.push(mhFootHint[0]);
-      RemoveArray.push(mhFootHint[1]);
-      RemoveArray.push(reader_cartoon_image[reader_cartoon_image.length - 1]);
-
-      RemoveArray.forEach((element) => {
-        if (element) element.remove();
-      });
-
-      Message("已清除");
-    });
-    // // 创建脚本框内容 - 下一页
-    const Script_02 = new CreateElement({appendElement:ScriptBox.Element,innerHTML:"下一页",style:CSS_ClassStyle.Script_01});
-    Script_02.Element.addEventListener("click", () => {
-      const NextPage = document.querySelector(".faarrowright");
-      NextPage.click();
+    // 创建脚本框内容 - 下一页
+    const Script_02 = new CreateElement({
+      appendElement: ScriptBox.Element,
+      innerHTML: "下一页",
+      style: `
+            width: 80%;
+            height: 24px;
+            border: 1px solid black;
+            border-radius: 8px;
+            background-color: white;
+            margin: 8px 0px 0px 0px;
+            font-size: 12px;
+            line-height: 24px;
+            text-align: center;
+        `,
+      event: {
+        str: "click",
+        call: () => {
+          const NextPage = document.querySelector(".faarrowright");
+          if(NextPage) NextPage.click();
+        },
+      },
     });
   }
 
