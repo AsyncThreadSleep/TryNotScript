@@ -20,8 +20,8 @@
     console.clear();
     console.log("TryNotScript: chocoi_Script Start");
 
-    const CSS_Style = GM_getResourceText("HTML");
-    const HTML_Code = GM_getResourceText("CSS");
+    const CSS_Style = GM_getResourceText("CSS");
+    const HTML_Code = GM_getResourceText("HTML");
 
     const TryNot_CSS = document.createElement("style");
     const TryNot_HTML = document.createElement("div");
