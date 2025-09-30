@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WebCleaner Pro - chocoi
 // @namespace    http://tampermonkey.net/
-// @version      250929
+// @version      250930
 // @description  适用于iphone 6s safari浏览器的chocoi.net漫画阅读器脚本
 // @author       TryNot
 // @match        https://chocoi.net/*
@@ -11,143 +11,142 @@
 // @resource     CSS https://raw.githubusercontent.com/AsyncThreadSleep/TryNotScript/main/WebCleaner Pro - chocoi/index.css
 // @resource     HTML https://raw.githubusercontent.com/AsyncThreadSleep/TryNotScript/main/WebCleaner Pro - chocoi/index.html
 // @grant        GM_getResourceText
+// @grant        unsafeWindow
 // ==/UserScript==
 
 (function () {
     "use strict";
 
-    try {
-        console.clear();
-        console.log("TryNotScript: chocoi_Script Start");
-
-        const CSS_Style = GM_getResourceText("CSS");
-        const HTML_Code = GM_getResourceText("HTML");
-
+    function init() {
         const TryNot_CSS = document.createElement("style");
         const TryNot_HTML = document.createElement("div");
 
-        TryNot_CSS.innerHTML = CSS_Style;
-        TryNot_HTML.innerHTML = HTML_Code;
+        TryNot_CSS.innerHTML = GM_getResourceText("CSS");
+        TryNot_HTML.innerHTML = GM_getResourceText("HTML");
 
         document.body.appendChild(TryNot_CSS);
         document.body.appendChild(TryNot_HTML);
 
-        // const urlObj = new URL(window.location.href);
-        // console.log("TryNotScript: chocoi_Script URL:", url.pathname.split('/').filter(Boolean));
+        return {
+            doms: {
+                TryNotScript: document.querySelector(".TryNotScript"),
+                ScriptTitle: document.querySelector(".ScriptTitle"),
+                ScriptBox: document.querySelector(".ScriptBox"),
+                ScriptFunction: document.querySelector(".ScriptFunction"),
+                ScriptSetting: document.querySelector(".ScriptSetting"),
+                TryNotButton: document.querySelector(".TryNotButton"),
+                RemoveAD: document.querySelector(".RemoveAD"),
+                NextPage: document.querySelector(".NextPage"),
+                Setting: document.querySelector(".Setting"),
+            },
+            data:{
+                TimeId: null,
+                ScriptTitle: "<p>TryNotScript</p>",
+            },
+            state: {
+                is_TryNotButton: false,
+                is_ScriptTitle: false,
+            },
+            functions: {
+                removeDoms: function (RemoveArray) {
+                    if (!Array.isArray(RemoveArray)) return false;
+                    RemoveArray.forEach((element) => {
+                        if (element) element.remove();
+                    });
+                    return true;
+                },
+                safeCallPageFunction: function (functionName, ...args) {
+                    try {
+                        if (unsafeWindow[functionName] && typeof unsafeWindow[functionName] === "function") {
+                            return unsafeWindow[functionName](...args);
+                        }
+                        return null;
+                    } catch (error) {
+                        return null;
+                    }
+                },
+                timedMessage: function ({MessageElement,DefaultMessage,is_TryNotButton,TimeId,title='', style=''}) {
+                    if (TimeId) clearTimeout(TimeId);
 
-        // 获取 Element
-        const TryNotScript = document.querySelector(".TryNotScript");
-        const ScriptTitle = document.querySelector(".ScriptTitle");
-        const ScriptBox = document.querySelector(".ScriptBox");
-        const ScriptFunction = document.querySelector(".ScriptFunction");
-        const ScriptSetting = document.querySelector(".ScriptSetting");
-        // 获取 按钮
-        const TryNotButton = document.querySelector(".TryNotButton");
-        const RemoveAD = document.querySelector(".RemoveAD");
-        const NextPage = document.querySelector(".NextPage");
-        const Setting = document.querySelector(".Setting");
+                    MessageElement.innerHTML = `<p style="${style}">${title}</p>`;
+                    MessageElement.style.width = "128px";
 
-        // 创建 状态管理
-        const state = {
-            TryNotButton: false,
-            ScriptTitle: false,
+                    TimeId = setTimeout(() => {
+                        if (!is_TryNotButton) MessageElement.style.width = "0px";
+                        MessageElement.innerHTML = DefaultMessage;
+                    }, 3000);
+                },
+                demo: () => {
+                    return this.data;
+                },
+            },
         };
+    }
 
-        const Message = new class TimedMessage {
-            static #defaultMessage = "<p>TryNotScript</p>";
-			#ScriptTitle;
-			#timerId = null;
-            constructor(ScriptTitle) {
-				this.#ScriptTitle = ScriptTitle;
-            }
-            #resetToDefault() {
-                this.#ScriptTitle.innerHTML = TimedMessage.#defaultMessage;
-            }
-            startResetTimer(delay = 3000) {
-                if (this.#timerId) clearTimeout(this.#timerId);
-                this.#timerId = setTimeout(() => {
-					if(!state.TryNotButton) this.#ScriptTitle.style.width = "0px";
-                    this.#resetToDefault();
-                }, delay);
-            }
-            updateMessage(newMessage) {
-                this.#ScriptTitle.innerHTML = `<p>${newMessage}</p>`;
-                this.startResetTimer();
-				this.#ScriptTitle.style.width = "128px";
-            }
-        }(ScriptTitle);
+    try {
+        const TryNot = init();
+        const TryNotDisplay = TryNot.doms.TryNotScript.style.display;
 
-        // 函数 - 获取用户配置
-        function GetUserConfig() {
-            const Config = localStorage.getItem("TryNotScript chocoi_Script");
-            if (Config) {
-                return JSON.parse(Config);
-            } else {
-                localStorage.setItem(
-                    "TryNotScript chocoi_Script",
-                    JSON.stringify({
-                        ScriptButton: "",
-                    })
-                );
-                return GetUserConfig();
-            }
-        }
+        TryNot.doms.TryNotScript.style.display = "none";
 
-        // 函数 - 清除广告
-        function ClearAD() {
-            const RemoveArray = new Array();
+        TryNot.doms.TryNotButton.addEventListener("click", () => {
+            const { is_TryNotButton } = TryNot.state;
 
+            TryNot.doms.ScriptBox.style.height = is_TryNotButton ? "0px" : "150px";
+            TryNot.doms.ScriptTitle.style.width = is_TryNotButton ? "0px" : "128px";
+
+            TryNot.state.is_TryNotButton = !is_TryNotButton;
+            TryNot.state.is_ScriptTitle = !is_TryNotButton;
+        });
+
+        TryNot.doms.RemoveAD.addEventListener("click", () => {
             const mhFootHint = document.querySelectorAll(".mhFootHint");
             const reader_cartoon_image = document.querySelectorAll(".reader-cartoon-image");
 
-            RemoveArray.push(document.querySelector(".loginbackwrap"));
-            RemoveArray.push(document.querySelector("div[data-type='1']"));
-            RemoveArray.push(document.querySelector(".div_sticky2"));
-            RemoveArray.push(mhFootHint[0]);
-            RemoveArray.push(mhFootHint[1]);
-            RemoveArray.push(reader_cartoon_image[reader_cartoon_image.length - 1]);
-            RemoveArray.push(document.querySelector(".reader-book-read-navbar"));
+            TryNot.functions.removeDoms([
+                document.querySelector(".loginbackwrap"), 
+                document.querySelector("div[data-type='1']"), 
+                document.querySelector(".div_sticky2"),
+                mhFootHint[0],
+                mhFootHint[1],
+                reader_cartoon_image[reader_cartoon_image.length - 1],
+                document.querySelector(".reader-book-read-navbar"),
+                ...document.querySelectorAll(".actions-group"),
+                ...document.querySelectorAll(".qt_lkphn")
+            ]);
 
-            RemoveArray.push(...document.querySelectorAll(".actions-group"));
-            RemoveArray.push(...document.querySelectorAll(".qt_lkphn"));
-
-            RemoveArray.forEach((element) => {
-                if (element) element.remove();
+            TryNot.functions.timedMessage({
+                MessageElement: TryNot.doms.ScriptTitle,
+                DefaultMessage: TryNot.data.ScriptTitle,
+                is_TryNotButton: TryNot.state.is_TryNotButton,
+                TimeId: TryNot.data.TimeId,
+                title: "已清除广告",
             });
+        });
 
-            Message.updateMessage("已清除广告");
+        TryNot.doms.NextPage.addEventListener("click", () => {
+            TryNot.functions.timedMessage({
+                MessageElement: TryNot.doms.ScriptTitle,
+                DefaultMessage: TryNot.data.ScriptTitle,
+                is_TryNotButton: TryNot.state.is_TryNotButton,
+                TimeId: TryNot.data.TimeId,
+                title: "即将跳转",
+            });
+            TryNot.functions.safeCallPageFunction("getNearByChapter",1);
+        });
+
+        TryNot.doms.TryNotScript.style.display = TryNotDisplay;
+
+        const title = document.querySelector(".title")
+        if (title) {
+            TryNot.data.ScriptTitle = `<p style="font-size: 12px;line-height: 16px;">${title.innerText.replace(/\n/, "<br>")}</p>`;
         }
 
-        // 函数 - 下一页
-        function ToNextPage() {
-            const NextPage = document.querySelector(".faarrowright");
-            Message.updateMessage("即将跳转");
-            NextPage ? NextPage.click() : Message.updateMessage("未找到下一页");
-        }
+        TryNot.doms.RemoveAD.click();
 
-        // 添加 事件监听 - 打开控制面板
-        TryNotButton.addEventListener("click", () => {
-            ScriptBox.style.height = state.TryNotButton ? "0px" : "150px";
-            ScriptTitle.style.width = state.TryNotButton ? "0px" : "128px";
-            state.TryNotButton = !state.TryNotButton;
-            state.ScriptTitle = state.TryNotButton ? true : false;
-        });
-        // 添加 事件监听 - 清除广告
-        RemoveAD.addEventListener("click", ClearAD);
-        // 添加 事件监听 - 下一页
-        NextPage.addEventListener("click", ToNextPage);
-
-        console.log("TryNotScript: chocoi_Script Run");
-
-        const title = document.querySelector(".title") ? document.querySelector(".title").innerText : "未找到标题";
-        ScriptTitle.innerHTML = `<p style="font-size: 12px;line-height: 16px;">${title.replace(/\n/, "<br>")}</p>`;
-        ClearAD();
-        Setting.addEventListener("click", () => {
-            Message.updateMessage("已打开设置");
-        });
     } catch (error) {
-        console.log("TryNotScript: chocoi_Script", error);
+        console.log("TryNotScript: WebCleaner Pro - chocoi", error);
     } finally {
-        console.log("TryNotScript: chocoi_Script End");
+        console.log("TryNotScript: WebCleaner Pro - chocoi End");
     }
 })();
