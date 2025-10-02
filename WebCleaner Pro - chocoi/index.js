@@ -3,10 +3,11 @@
 // @author       TryNot
 // @namespace    https://github.com/AsyncThreadSleep
 // @homepage     https://github.com/AsyncThreadSleep/TryNotScript
-// @version      251001
+// @version      251002
 // @description  适用于iphone 6s safari浏览器的chocoi.net漫画阅读器脚本
 // @run-at       document-idle
 // @match        https://chocoi.net/*
+// @match        https://boylove.cc/*
 // @exclude      tsyndicate.com
 // @exclude      ib.eu.ggmnd.com
 // @exclude      techyra.com
@@ -156,7 +157,7 @@
                 /^\s*$/.test(v) ? titleArray.splice(i, 1) : null;
             });
             TryNot.doms.PageNumber.innerHTML = `<p>${titleArray[1]}</p>` || "当前话数";
-            TryNot.doms.ScriptTitle.innerHTML = `<p>${titleArray[0]}</p>` || "TryNotScript";
+            TryNot.data.ScriptTitle = titleArray[0] || "TryNotScript";
         }
 
         TryNot.doms.TryNotScript.style.display = "block";
