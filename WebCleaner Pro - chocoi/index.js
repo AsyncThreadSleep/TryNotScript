@@ -153,14 +153,14 @@
             titleArray.forEach((v, i) => {
                 /^\s*$/.test(v) ? titleArray.splice(i, 1) : null;
             });
-            TryNot.doms.PageNumber.innerText = titleArray[1] || "当前话数";
-            TryNot.doms.ScriptTitle.innerText = `<p>${titleArray[0]}</p>`;
+            TryNot.doms.PageNumber.innerHTML = `<p>${titleArray[1]}</p>` || "当前话数";
+            TryNot.doms.ScriptTitle.innerHTML = `<p>${titleArray[0]}</p>` || "TryNotScript";
         }
 
         TryNot.doms.TryNotScript.style.display = "block";
         TryNot.doms.RemoveAD.click();
     } catch (error) {
-        console.log("TryNotScript: WebCleaner Pro - chocoi ErrorMessage :", error.message);
+        console.log("TryNotScript: WebCleaner Pro - chocoi ErrorMessage : ", error.message);
     } finally {
         console.log("TryNotScript: WebCleaner Pro - chocoi End");
     }
