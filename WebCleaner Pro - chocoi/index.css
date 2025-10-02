@@ -8,6 +8,7 @@
 .TryNotScript {
     --border-radius: 8px;
     --background-color: rgba(95, 158, 160, 1);
+    display: none;
     position: absolute;
     top: 6px;
     left: 6px;
@@ -18,7 +19,8 @@
 .ScriptTitle,
 .ScriptBox,
 .ScriptButton,
-.Setting {
+.Setting,
+.Number {
     border-radius: var(--border-radius);
 }
 
@@ -109,4 +111,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.Number{
+    width: 78px;
+    height: 23px;
+    border: 1px solid rgba(0, 0, 0, 1);
+    background-color: rgba(255, 255, 255, 1);
+    margin-left: 15px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 21px;
 }
