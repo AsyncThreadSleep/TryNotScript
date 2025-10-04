@@ -2,39 +2,39 @@
     margin: 0;
     padding: 0;
     user-select: none;
-    font-family: initial;
+    font-family: initial
 }
 
 .TryNotScript {
     --border-radius: 8px;
-    --background-color: rgba(95, 158, 160, 1);
-    --border: 1px solid rgba(0, 0, 0, 1);
-    display: none;
+    --background-color: #5f9ea0;
+    --border: 1px solid #000;
     position: absolute;
+    display: none;
     top: 6px;
     left: 6px;
-    z-index: 9999993;
+    z-index: 9999993
 }
 
-.TryNotButton,
-.ScriptTitle,
+.PageNumber,
 .ScriptBox,
 .ScriptButton,
-.Setting,
-.PageNumber {
-    border-radius: var(--border-radius);
-}
-
-.TryNotButton,
 .ScriptTitle,
-.ScriptBox {
-    background-color: var(--background-color);
+.Setting,
+.TryNotButton {
+    border-radius: var(--border-radius)
 }
 
+.ScriptBox,
+.ScriptTitle,
+.TryNotButton {
+    background-color: var(--background-color)
+}
+
+.PageNumber,
 .ScriptButton,
-.Setting,
-.PageNumber {
-    border: var(--border);
+.Setting {
+    border: var(--border)
 }
 
 .TryNotButton {
@@ -42,22 +42,22 @@
     height: 32px;
     font-size: 16px;
     text-align: center;
-    line-height: 28px;
+    line-height: 28px
 }
 
 .ScriptTitle {
-    width: 0px;
+    width: 0;
     height: 32px;
     position: absolute;
     top: 0;
     left: 64px;
     margin-left: 6px;
     box-sizing: border-box;
-    transition: width 0.5s;
+    transition: width .5s;
     overflow: hidden;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: center
 }
 
 .ScriptTitle>p {
@@ -67,64 +67,71 @@
     line-height: 30px;
     text-align: center;
     overflow: overlay;
+    scrollbar-width: none
 }
 
 .ScriptBox {
     width: 150px;
     height: 0px;
-    display: flex;
-    flex-direction: column;
     overflow: hidden;
-    transition: height 0.5s;
-    margin-top: 6px;
+    transition: height .5s;
+    margin-top: 6px
+}
+
+.ScriptBox,
+.ScriptFunction {
+    display: flex;
+    flex-direction: column
 }
 
 .ScriptFunction {
     width: 100%;
     height: 105px;
-    display: flex;
-    flex-direction: column;
     align-items: center;
     overflow: auto;
-    scrollbar-width: none;
+    scrollbar-width: none
 }
 
 .ScriptButton {
     width: 118px;
     height: 30px;
-    background-color: rgba(255, 255, 255, 1);
+    background-color: #fff;
     margin-top: 15px;
     overflow: hidden;
     flex-shrink: 0;
     font-size: 16px;
     text-align: center;
-    line-height: 28px;
+    line-height: 28px
 }
 
 .ScriptSetting {
     width: 100%;
     height: 45px;
-    padding: 0px 15px;
-    box-sizing: border-box;
+    padding: 0 15px;
+    box-sizing: border-box
+}
+
+.ScriptSetting,
+.Setting {
     display: flex;
-    align-items: center;
+    align-items: center
 }
 
 .Setting {
     width: 23px;
+    justify-content: center
+}
+
+.PageNumber,
+.Setting {
     height: 23px;
-    background-color: rgba(255, 255, 255, 1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background-color: #fff
 }
 
 .PageNumber {
     width: 78px;
-    height: 23px;
-    background-color: rgba(255, 255, 255, 1);
     margin-left: 15px;
     text-align: center;
     font-size: 12px;
-    line-height: 21px;
+    line-height: 21px
 }

@@ -28,143 +28,130 @@
 (function () {
     "use strict";
 
-    function init() {
-        const is_CSS = GM_getResourceText("CSS");
-        const is_HTML = GM_getResourceText("HTML");
-
-        if (!is_CSS || !is_HTML) throw new Error("资源加载失败");
-
-        const TryNot_CSS = document.createElement("style");
-        const TryNot_HTML = document.createElement("div");
-
-        TryNot_CSS.innerHTML = is_CSS;
-        TryNot_HTML.innerHTML = is_HTML;
-
-        document.body.appendChild(TryNot_CSS);
-        document.body.appendChild(TryNot_HTML);
-
-        const doms = {
-            TryNotScript: document.querySelector(".TryNotScript"),
-            ScriptTitle: document.querySelector(".ScriptTitle"),
-            ScriptBox: document.querySelector(".ScriptBox"),
-            ScriptFunction: document.querySelector(".ScriptFunction"),
-            ScriptSetting: document.querySelector(".ScriptSetting"),
-            TryNotButton: document.querySelector(".TryNotButton"),
-            RemoveAD: document.querySelector(".RemoveAD"),
-            NextPage: document.querySelector(".NextPage"),
-            Setting: document.querySelector(".Setting"),
-            PageNumber: document.querySelector(".PageNumber"),
-        };
-
-        if (Object.values(doms).some((v) => v === null)) throw new Error("元素加载失败");
-
-        return {
-            doms: doms,
-            data: {
-                TimeId: null,
-                ScriptTitle: "<p>TryNotScript</p>",
-            },
-            state: {
-                is_TryNotButton: false,
-                is_ScriptTitle: false,
-            },
-            functions: {
-                removeDoms: function (RemoveArray) {
-                    if (!Array.isArray(RemoveArray)) return false;
-                    RemoveArray.forEach((element) => {
-                        if (element) element.remove();
-                    });
-                    return true;
-                },
-                safeCallPageFunction: function (functionName, ...args) {
-                    try {
-                        if (unsafeWindow[functionName] && typeof unsafeWindow[functionName] === "function") {
-                            return unsafeWindow[functionName](...args);
-                        }
-                        return null;
-                    } catch (error) {
-                        return null;
-                    }
-                },
-                timedMessage: function ({ MessageElement, DefaultMessage, is_TryNotButton, TimeId, title = "", style = "" }) {
-                    if (TimeId) clearTimeout(TimeId);
-
-                    MessageElement.innerHTML = `<p style="${style}">${title}</p>`;
-                    MessageElement.style.width = "128px";
-
-                    TimeId = setTimeout(() => {
-                        if (!is_TryNotButton) MessageElement.style.width = "0px";
-                        MessageElement.innerHTML = DefaultMessage;
-                    }, 3000);
-                },
-            },
-        };
-    }
-
-    try {
-        const TryNot = init();
-
-        TryNot.doms.TryNotButton.addEventListener("click", () => {
-            const { is_TryNotButton } = TryNot.state;
-
-            TryNot.doms.ScriptBox.style.height = is_TryNotButton ? "0px" : "150px";
-            TryNot.doms.ScriptTitle.style.width = is_TryNotButton ? "0px" : "128px";
-
-            TryNot.state.is_TryNotButton = !is_TryNotButton;
-            TryNot.state.is_ScriptTitle = !is_TryNotButton;
-        });
-
-        TryNot.doms.RemoveAD.addEventListener("click", () => {
-            const mhFootHint = document.querySelectorAll(".mhFootHint");
-            const reader_cartoon_image = document.querySelectorAll(".reader-cartoon-image");
-
-            TryNot.functions.removeDoms([
-                document.querySelector(".loginbackwrap"),
-                document.querySelector("div[data-type='1']"),
-                document.querySelector(".div_sticky2"),
-                mhFootHint[0],
-                mhFootHint[1],
-                reader_cartoon_image[reader_cartoon_image.length - 1],
-                document.querySelector(".reader-book-read-navbar"),
-                ...document.querySelectorAll(".actions-group"),
-                ...document.querySelectorAll(".qt_lkphn"),
-            ]);
-
-            TryNot.functions.timedMessage({
-                MessageElement: TryNot.doms.ScriptTitle,
-                DefaultMessage: TryNot.data.ScriptTitle,
-                is_TryNotButton: TryNot.state.is_TryNotButton,
-                TimeId: TryNot.data.TimeId,
-                title: "已清除广告",
+    const Tool = {
+        elementArrayForRemove: function (RemoveArray) {
+            if (!Array.isArray(RemoveArray)) throw new Error("RemoveArray参数错误");
+            RemoveArray.forEach((element) => {
+                if (element && element.nodeType === Node.ELEMENT_NODE) element.remove();
             });
-        });
-
-        TryNot.doms.NextPage.addEventListener("click", () => {
-            TryNot.functions.timedMessage({
-                MessageElement: TryNot.doms.ScriptTitle,
-                DefaultMessage: TryNot.data.ScriptTitle,
-                is_TryNotButton: TryNot.state.is_TryNotButton,
-                TimeId: TryNot.data.TimeId,
-                title: "即将跳转",
-            });
-            TryNot.functions.safeCallPageFunction("getNearByChapter", 1);
-        });
-
-        const title = document.querySelector(".title");
-        if (title) {
-            const titleArray = title.innerText.split("\n");
-            titleArray.forEach((v, i) => {
-                /^\s*$/.test(v) ? titleArray.splice(i, 1) : null;
-            });
-            TryNot.doms.PageNumber.innerHTML = `<p>${titleArray[1]}</p>` || "当前话数";
-            TryNot.data.ScriptTitle = titleArray[0] || "TryNotScript";
+        },
+        safeCallPageFunction: function (functionName, ...args) {
+            try {
+                if (unsafeWindow[functionName] && typeof unsafeWindow[functionName] === "function") {
+                    return unsafeWindow[functionName](...args);
+                }
+                return null;
+            } catch (error) {
+                return null;
+            }
         }
+    };
 
-        TryNot.doms.TryNotScript.style.display = "block";
-        TryNot.doms.RemoveAD.click();
-    } catch (error) {
-        console.log("TryNotScript: WebCleaner Pro - chocoi ErrorMessage : ", error.message);
-    } finally {
-        console.log("TryNotScript: WebCleaner Pro - chocoi End");
+    const TryNot = new (class {
+        Elements;
+        #title = "TryNotScript";
+        #page = "page";
+        #switch = false;
+        #TimeId;
+        constructor() {
+            const is_CSS = GM_getResourceText("CSS");
+            const is_HTML = GM_getResourceText("HTML");
+
+            if (!is_CSS || !is_HTML) throw new Error("资源加载失败");
+
+            const TryNot_CSS = document.createElement("style");
+            const TryNot_HTML = document.createElement("div");
+
+            TryNot_CSS.innerHTML = is_CSS;
+            TryNot_HTML.innerHTML = is_HTML;
+
+            document.body.appendChild(TryNot_CSS);
+            document.body.appendChild(TryNot_HTML);
+
+            const Elements = {
+                TryNotScript: TryNot_HTML.querySelector(".TryNotScript"),
+                TryNotButton: TryNot_HTML.querySelector(".TryNotButton"),
+                ScriptTitle: TryNot_HTML.querySelector(".ScriptTitle"),
+                ScriptBox: TryNot_HTML.querySelector(".ScriptBox"),
+                ScriptFunction: TryNot_HTML.querySelector(".ScriptFunction"),
+                previousPage: TryNot_HTML.querySelector(".previousPage"),
+                NextPage: TryNot_HTML.querySelector(".NextPage"),
+                RemoveAD: TryNot_HTML.querySelector(".RemoveAD"),
+                ScriptSetting: TryNot_HTML.querySelector(".ScriptSetting"),
+                Setting: TryNot_HTML.querySelector(".Setting"),
+                PageNumber: TryNot_HTML.querySelector(".PageNumber"),
+            };
+
+            if (Object.values(Elements).some((v) => v === null)) throw new Error("元素加载失败");
+
+            this.Elements = Elements;
+        }
+        timedMessage(Message) {
+            if (this.#TimeId) clearTimeout(this.#TimeId);
+
+            this.Elements.ScriptTitle.innerHTML = `<p>${Message}</p>`;
+            this.Elements.ScriptTitle.style.width = "128px";
+
+            this.#TimeId = setTimeout(() => {
+                if (this.Elements.ScriptBox.style.height <= 0) this.Elements.ScriptTitle.style.width = "0px";
+                this.Elements.ScriptTitle.innerHTML = `<p>${this.#title}</p>`;
+            }, 3000);
+        }
+        switchTryNot() {
+            this.Elements.ScriptBox.style.height = this.#switch ? "0px" : "150px";
+            this.Elements.ScriptTitle.style.width = this.#switch ? "0px" : "128px";
+            this.#switch = !this.#switch;
+        }
+        updataTitle(title, page = null) {
+            this.#title = title;
+            if (page) this.#page = page;
+            this.Elements.ScriptTitle.innerHTML = `<p>${this.#title}</p>`;
+            TryNot.Elements.PageNumber.innerHTML = `<p>${this.#page}</p>`;
+        }
+    })();
+
+    TryNot.Elements.TryNotButton.addEventListener("click", () => {
+        TryNot.switchTryNot();
+    });
+
+    TryNot.Elements.previousPage.addEventListener("click", () => {
+        TryNot.timedMessage("即将跳转");
+        Tool.safeCallPageFunction("getNearByChapter", 0);
+    });
+
+    TryNot.Elements.NextPage.addEventListener("click", () => {
+        TryNot.timedMessage("即将跳转");
+        Tool.safeCallPageFunction("getNearByChapter", 1);
+    });
+
+    TryNot.Elements.RemoveAD.addEventListener("click", () => {
+        const mhFootHint = document.querySelectorAll(".mhFootHint");
+        const reader_cartoon_image = document.querySelectorAll(".reader-cartoon-image");
+
+        Tool.elementArrayForRemove([
+            document.querySelector(".loginbackwrap"),
+            document.querySelector("div[data-type='1']"),
+            document.querySelector(".div_sticky2"),
+            mhFootHint[0],
+            mhFootHint[1],
+            reader_cartoon_image[reader_cartoon_image.length - 1],
+            document.querySelector(".reader-book-read-navbar"),
+            ...document.querySelectorAll(".actions-group"),
+            ...document.querySelectorAll(".qt_lkphn"),
+        ]);
+
+        TryNot.timedMessage("已清除广告");
+    });
+
+    const title = document.querySelector(".title");
+    if (title) {
+        const titleArray = title.innerText.split("\n");
+        titleArray.forEach((v, i) => {
+            /^\s*$/.test(v) ? titleArray.splice(i, 1) : null;
+        });
+        TryNot.updataTitle(titleArray[0] || "TryNotScript", titleArray[1]);
     }
+
+    TryNot.Elements.TryNotScript.style.display = "block";
+    TryNot.Elements.RemoveAD.click();
 })();
