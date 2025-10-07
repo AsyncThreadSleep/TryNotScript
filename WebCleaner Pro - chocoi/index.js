@@ -3,7 +3,7 @@
 // @author       TryNot
 // @namespace    https://github.com/AsyncThreadSleep
 // @homepage     https://github.com/AsyncThreadSleep/TryNotScript
-// @version      251002
+// @version      251003
 // @description  适用于iphone 6s safari浏览器的chocoi.net漫画阅读器脚本
 // @run-at       document-idle
 // @match        https://chocoi.net/*
@@ -70,15 +70,15 @@
 
             const Elements = {
                 TryNotScript: TryNot_HTML.querySelector(".TryNotScript"),
-                TryNotButton: TryNot_HTML.querySelector(".TryNotButton"),
-                ScriptTitle: TryNot_HTML.querySelector(".ScriptTitle"),
-                ScriptBox: TryNot_HTML.querySelector(".ScriptBox"),
-                ScriptFunction: TryNot_HTML.querySelector(".ScriptFunction"),
-                previousPage: TryNot_HTML.querySelector(".previousPage"),
-                NextPage: TryNot_HTML.querySelector(".NextPage"),
+                TryNotButton: TryNot_HTML.querySelector(".TopBar_Button"),
+                ScriptTitle: TryNot_HTML.querySelector(".TopBar_Title"),
+                ScriptBox: TryNot_HTML.querySelector(".MainBox"),
+                ScriptFunction: TryNot_HTML.querySelector(".MainBox_Main"),
+                previousPage: TryNot_HTML.querySelector(".CutPage_Next"),
+                NextPage: TryNot_HTML.querySelector(".CutPage_To"),
                 RemoveAD: TryNot_HTML.querySelector(".RemoveAD"),
-                ScriptSetting: TryNot_HTML.querySelector(".ScriptSetting"),
-                Setting: TryNot_HTML.querySelector(".Setting"),
+                ScriptSetting: TryNot_HTML.querySelector(".MainBox_Bottom"),
+                Setting: TryNot_HTML.querySelector(".Setting_Button"),
                 PageNumber: TryNot_HTML.querySelector(".PageNumber"),
             };
 
@@ -86,21 +86,42 @@
 
             this.Elements = Elements;
         }
+        #switchTitle(cout){
+            if (cout) {
+                if(this.#switch) return;
+                this.Elements.ScriptTitle.style.width = "0px";
+                this.Elements.ScriptTitle.style.padding = "0px 0px";
+            } else {
+                this.Elements.ScriptTitle.style.width = "128px";
+                this.Elements.ScriptTitle.style.padding = "0px 8px";
+            }
+        }
+        #switchMain(cout){
+            this.#switchTitle(cout);
+            if(cout){
+                this.Elements.ScriptBox.style.height = "0px";
+                this.Elements.ScriptBox.style.padding = "0px 8px";
+                this.#switch = false;
+            }else{ 
+                this.Elements.ScriptBox.style.height = "150px";
+                this.Elements.ScriptBox.style.padding = "6px 8px";
+                this.#switch = true;
+            }
+        }
         timedMessage(Message) {
             if (this.#TimeId) clearTimeout(this.#TimeId);
 
             this.Elements.ScriptTitle.innerHTML = `<p>${Message}</p>`;
-            this.Elements.ScriptTitle.style.width = "128px";
+            this.#switchTitle(true);
 
             this.#TimeId = setTimeout(() => {
-                if (this.Elements.ScriptBox.style.height <= 0) this.Elements.ScriptTitle.style.width = "0px";
+                if (!this.#switch) this.#switchTitle(false);
                 this.Elements.ScriptTitle.innerHTML = `<p>${this.#title}</p>`;
             }, 3000);
         }
         switchTryNot() {
-            this.Elements.ScriptBox.style.height = this.#switch ? "0px" : "150px";
-            this.Elements.ScriptTitle.style.width = this.#switch ? "0px" : "128px";
-            this.#switch = !this.#switch;
+            this.#switchMain(this.#switch);
+            // this.#switchTitle();
         }
         updataTitle(title, page = null) {
             this.#title = title;
@@ -125,19 +146,15 @@
     });
 
     TryNot.Elements.RemoveAD.addEventListener("click", () => {
-        const mhFootHint = document.querySelectorAll(".mhFootHint");
-        const reader_cartoon_image = document.querySelectorAll(".reader-cartoon-image");
-
         Tool.elementArrayForRemove([
             document.querySelector(".loginbackwrap"),
-            document.querySelector("div[data-type='1']"),
             document.querySelector(".div_sticky2"),
-            mhFootHint[0],
-            mhFootHint[1],
-            reader_cartoon_image[reader_cartoon_image.length - 1],
+            document.querySelector(".reader-cartoon-image>a"),
             document.querySelector(".reader-book-read-navbar"),
+            ...document.querySelectorAll(".mhFootHint"),
             ...document.querySelectorAll(".actions-group"),
             ...document.querySelectorAll(".qt_lkphn"),
+            ...document.querySelectorAll(".wpvwcwve"),
         ]);
 
         TryNot.timedMessage("已清除广告");

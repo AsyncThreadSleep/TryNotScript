@@ -1,138 +1,151 @@
-.TryNotScript * {
+.TryNotScript *{ 
     margin: 0;
     padding: 0;
     user-select: none;
-    font-family: initial
-}
-
-.TryNotScript {
-    --border-radius: 8px;
-    --background-color: #5f9ea0;
-    --border: 1px solid #000;
-    position: absolute;
-    display: none;
-    top: 6px;
-    left: 6px;
-    z-index: 9999993
-}
-
-.PageNumber,
-.ScriptBox,
-.ScriptButton,
-.ScriptTitle,
-.Setting,
-.TryNotButton {
-    border-radius: var(--border-radius)
-}
-
-.ScriptBox,
-.ScriptTitle,
-.TryNotButton {
-    background-color: var(--background-color)
-}
-
-.PageNumber,
-.ScriptButton,
-.Setting {
-    border: var(--border)
-}
-
-.TryNotButton {
-    width: 64px;
-    height: 32px;
-    font-size: 16px;
-    text-align: center;
-    line-height: 28px
-}
-
-.ScriptTitle {
-    width: 0;
-    height: 32px;
-    position: absolute;
-    top: 0;
-    left: 64px;
-    margin-left: 6px;
-    box-sizing: border-box;
-    transition: width .5s;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center
-}
-
-.ScriptTitle>p {
-    width: 90%;
-    height: 32px;
-    font-size: 16px;
-    line-height: 30px;
-    text-align: center;
-    overflow-y: hidden;
-    white-space: nowrap;
-    scrollbar-width: none
-}
-
-.ScriptBox {
-    width: 150px;
-    height: 0px;
-    overflow: hidden;
-    transition: height .5s;
-    margin-top: 6px
-}
-
-.ScriptBox,
-.ScriptFunction {
-    display: flex;
-    flex-direction: column
-}
-
-.ScriptFunction {
-    width: 100%;
-    height: 105px;
-    align-items: center;
-    overflow: auto;
-    scrollbar-width: none
-}
-
-.ScriptButton {
-    width: 118px;
-    height: 30px;
-    background-color: #fff;
-    margin-top: 15px;
+    font-family: initial;
+    transition: all .5s;
+    /* transition: max-height .5s ease-in-out; */
     overflow: hidden;
     flex-shrink: 0;
-    font-size: 16px;
-    text-align: center;
-    line-height: 28px
 }
 
-.ScriptSetting {
+.TryNotScript{
+    width: 200px;
+    height: 200px;
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    z-index: 9999993;
+    color: rgb(210, 210, 210);
+    overflow: hidden;
+
+}
+
+.TopBar{
     width: 100%;
-    height: 45px;
-    padding: 0 15px;
-    box-sizing: border-box
-}
-
-.ScriptSetting,
-.Setting {
+    height: 32px;
     display: flex;
-    align-items: center
+    flex-direction: row;
 }
 
-.Setting {
-    width: 23px;
-    justify-content: center
-}
-
-.PageNumber,
-.Setting {
-    height: 23px;
-    background-color: #fff
-}
-
-.PageNumber {
-    width: 78px;
-    margin-left: 15px;
+.TopBar_Button{
+    width: 64px;
+    height: 100%;
+    border-radius: 8px;
+    background-color: rgb(47, 67, 71);
     text-align: center;
-    font-size: 12px;
-    line-height: 21px
+    line-height: 30px;
+    font-size: 14px;
+}
+
+.TopBar_Title{
+    /* width: 128px; */
+    width: 0px;
+    height: 100%;
+    border-radius: 8px;
+    background-color: rgb(47, 67, 71);
+    text-align: center;
+    line-height: 30px;
+    font-size: 14px;
+    /* padding: 0px 8px; */
+    padding: 0px 0px;
+    margin-left: 6px;
+    box-sizing: border-box;
+}
+
+.TopBar_Title>p{
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scrollbar-width: none;
+}
+
+.MainBox{
+    width: 150px;
+    /* height: 150px; */
+    height: 0px;
+    background-color: rgb(47, 67, 71);
+    border-radius: 8px;
+    margin-top: 6px;
+    /* padding: 6px 8px; */
+    padding: 0px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.MainBox_Main{
+    width: 100%;
+    height: 105px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: auto;
+    scrollbar-width: none;
+}
+
+.MainBox_Bottom{
+    width: 95%;
+    height: 45px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ScriptButton{
+    width: 95%;
+    height: 32px;
+    text-align: center;
+    background-color: rgb(250,250,250);
+    line-height: 30px;
+    border-radius: 8px;
+    border: 1px solid rgb(0, 0, 0);
+    color: rgb(0, 0, 0);
+    margin-top: 6px;
+    margin-bottom: 3px;
+}
+
+.CutPage{
+    width: 95%;
+    height: 32px;
+    text-align: center;
+    line-height: 30px;
+    color: rgb(0, 0, 0);
+    margin-top: 6px;
+    margin-bottom: 3px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.CutPage_Next,
+.CutPage_To{
+    width: 47%;
+    border-radius: 8px;
+    border: 1px solid rgb(0, 0, 0);
+    background-color: rgb(250,250,250);
+}
+
+.Setting_Button{
+    width: 32px;
+    height: 32px;
+    background-color: rgb(250,250,250);
+    border-radius: 8px;
+    border: 1px solid rgb(0, 0, 0);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.PageNumber{
+    width: 96px;
+    height: 32px;
+    background-color: rgb(250,250,250);
+    border-radius: 8px;
+    border: 1px solid rgb(0, 0, 0);
+    text-align: center;
+    color: rgb(0, 0, 0);
+    line-height: 28px;
 }
