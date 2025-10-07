@@ -3,7 +3,7 @@
 // @author       TryNot
 // @namespace    https://github.com/AsyncThreadSleep
 // @homepage     https://github.com/AsyncThreadSleep/TryNotScript
-// @version      251003
+// @version      251004
 // @description  适用于iphone 6s safari浏览器的chocoi.net漫画阅读器脚本
 // @run-at       document-idle
 // @match        https://chocoi.net/*
@@ -88,25 +88,25 @@
         }
         #switchTitle(cout){
             if (cout) {
+                this.Elements.ScriptTitle.style.width = "128px";
+                this.Elements.ScriptTitle.style.padding = "0px 8px";
+            } else {
                 if(this.#switch) return;
                 this.Elements.ScriptTitle.style.width = "0px";
                 this.Elements.ScriptTitle.style.padding = "0px 0px";
-            } else {
-                this.Elements.ScriptTitle.style.width = "128px";
-                this.Elements.ScriptTitle.style.padding = "0px 8px";
             }
         }
         #switchMain(cout){
-            this.#switchTitle(cout);
             if(cout){
-                this.Elements.ScriptBox.style.height = "0px";
-                this.Elements.ScriptBox.style.padding = "0px 8px";
-                this.#switch = false;
-            }else{ 
                 this.Elements.ScriptBox.style.height = "150px";
                 this.Elements.ScriptBox.style.padding = "6px 8px";
                 this.#switch = true;
+            }else{ 
+                this.Elements.ScriptBox.style.height = "0px";
+                this.Elements.ScriptBox.style.padding = "0px 8px";
+                this.#switch = false;
             }
+            this.#switchTitle(cout);
         }
         timedMessage(Message) {
             if (this.#TimeId) clearTimeout(this.#TimeId);
@@ -120,8 +120,7 @@
             }, 3000);
         }
         switchTryNot() {
-            this.#switchMain(this.#switch);
-            // this.#switchTitle();
+            this.#switchMain(!this.#switch);
         }
         updataTitle(title, page = null) {
             this.#title = title;
