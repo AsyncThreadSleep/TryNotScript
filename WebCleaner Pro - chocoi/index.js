@@ -3,7 +3,7 @@
 // @author       TryNot
 // @namespace    https://github.com/AsyncThreadSleep
 // @homepage     https://github.com/AsyncThreadSleep/TryNotScript
-// @version      251004
+// @version      251005
 // @description  适用于iphone 6s safari浏览器的chocoi.net漫画阅读器脚本
 // @run-at       document-idle
 // @match        https://chocoi.net/*
@@ -86,27 +86,29 @@
 
             this.Elements = Elements;
         }
-        #switchTitle(cout){
-            if (cout) {
-                this.Elements.ScriptTitle.style.width = "128px";
-                this.Elements.ScriptTitle.style.padding = "0px 8px";
+        #switchTitle(visible){
+            const ScriptTitle = this.Elements.ScriptTitle;
+            if (visible) {
+                ScriptTitle.style.width = "128px";
+                ScriptTitle.style.padding = "0px 8px";
             } else {
                 if(this.#switch) return;
-                this.Elements.ScriptTitle.style.width = "0px";
-                this.Elements.ScriptTitle.style.padding = "0px 0px";
+                ScriptTitle.style.width = "0px";
+                ScriptTitle.style.padding = "0px 0px";
             }
         }
-        #switchMain(cout){
-            if(cout){
-                this.Elements.ScriptBox.style.height = "150px";
-                this.Elements.ScriptBox.style.padding = "6px 8px";
+        #switchMain(visible){
+            const ScriptBox = this.Elements.ScriptBox;
+            if(visible){
+                ScriptBox.style.height = "150px";
+                ScriptBox.style.padding = "6px 8px";
                 this.#switch = true;
-            }else{ 
-                this.Elements.ScriptBox.style.height = "0px";
-                this.Elements.ScriptBox.style.padding = "0px 8px";
+            }else{
+                ScriptBox.style.height = "0px";
+                ScriptBox.style.padding = "0px 8px";
                 this.#switch = false;
             }
-            this.#switchTitle(cout);
+            this.#switchTitle(visible);
         }
         timedMessage(Message) {
             if (this.#TimeId) clearTimeout(this.#TimeId);
@@ -148,12 +150,13 @@
         Tool.elementArrayForRemove([
             document.querySelector(".loginbackwrap"),
             document.querySelector(".div_sticky2"),
-            document.querySelector(".reader-cartoon-image>a"),
             document.querySelector(".reader-book-read-navbar"),
+            document.querySelector(".reader-cartoon-image>a"),
             ...document.querySelectorAll(".mhFootHint"),
             ...document.querySelectorAll(".actions-group"),
             ...document.querySelectorAll(".qt_lkphn"),
             ...document.querySelectorAll(".wpvwcwve"),
+            ...document.querySelectorAll('.pgwalqmn'),
         ]);
 
         TryNot.timedMessage("已清除广告");

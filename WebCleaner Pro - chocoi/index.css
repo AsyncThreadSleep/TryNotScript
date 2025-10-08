@@ -4,7 +4,6 @@
     user-select: none;
     font-family: initial;
     transition: all .5s;
-    /* transition: max-height .5s ease-in-out; */
     overflow: hidden;
     flex-shrink: 0;
 }
@@ -16,7 +15,6 @@
     top: 6px;
     left: 8px;
     z-index: 9999993;
-    color: rgb(210, 210, 210);
     overflow: hidden;
 
 }
@@ -32,22 +30,20 @@
     width: 64px;
     height: 100%;
     border-radius: 8px;
-    background-color: rgb(47, 67, 71);
+    background-color: rgb(241,207,164);
     text-align: center;
     line-height: 30px;
     font-size: 14px;
 }
 
 .TopBar_Title{
-    /* width: 128px; */
     width: 0px;
     height: 100%;
     border-radius: 8px;
-    background-color: rgb(47, 67, 71);
+    background-color: rgb(241,207,164);
     text-align: center;
     line-height: 30px;
     font-size: 14px;
-    /* padding: 0px 8px; */
     padding: 0px 0px;
     margin-left: 6px;
     box-sizing: border-box;
@@ -61,13 +57,11 @@
 }
 
 .MainBox{
-    width: 150px;
-    /* height: 150px; */
+    width: 128px;
     height: 0px;
-    background-color: rgb(47, 67, 71);
+    background-color: rgb(241,207,164);
     border-radius: 8px;
     margin-top: 6px;
-    /* padding: 6px 8px; */
     padding: 0px 8px;
     display: flex;
     flex-direction: column;
@@ -140,7 +134,7 @@
 }
 
 .PageNumber{
-    width: 96px;
+    width: 80px;
     height: 32px;
     background-color: rgb(250,250,250);
     border-radius: 8px;
