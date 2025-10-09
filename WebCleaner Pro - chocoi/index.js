@@ -3,9 +3,9 @@
 // @author       TryNot
 // @namespace    https://github.com/AsyncThreadSleep
 // @homepage     https://github.com/AsyncThreadSleep/TryNotScript
-// @version      251005
+// @version      251009
 // @description  适用于iphone 6s safari浏览器的chocoi.net漫画阅读器脚本
-// @run-at       document-idle
+// @run-at       document-end
 // @match        https://chocoi.net/*
 // @match        https://boylove.cc/*
 // @exclude      tsyndicate.com
@@ -28,6 +28,94 @@
 (function () {
     "use strict";
 
+    function CreateTryNot() {
+        const is_CSS = GM_getResourceText("CSS");
+        const is_HTML = GM_getResourceText("HTML");
+
+        if (!is_CSS || !is_HTML) throw new Error("资源加载失败");
+
+        const TryNot_CSS = document.createElement("style");
+        const TryNot_HTML = document.createElement("div");
+
+        TryNot_CSS.textContent = is_CSS;
+        TryNot_HTML.innerHTML = is_HTML;
+
+        const Elements = {
+            TryNotScript: TryNot_HTML.querySelector(".TryNotScript"),
+            TryNotButton: TryNot_HTML.querySelector(".TopBar_Button"),
+            ScriptTitle: TryNot_HTML.querySelector(".TopBar_Title"),
+            ScriptBox: TryNot_HTML.querySelector(".MainBox"),
+            ScriptFunction: TryNot_HTML.querySelector(".MainBox_Main"),
+            previousPage: TryNot_HTML.querySelector(".CutPage_Next"),
+            NextPage: TryNot_HTML.querySelector(".CutPage_To"),
+            RemoveAD: TryNot_HTML.querySelector(".RemoveAD"),
+            ScriptSetting: TryNot_HTML.querySelector(".MainBox_Bottom"),
+            Setting: TryNot_HTML.querySelector(".Setting_Button"),
+            PageNumber: TryNot_HTML.querySelector(".PageNumber"),
+        };
+
+        if (Object.values(Elements).some((v) => v === null)) throw new Error("元素加载失败");
+
+        document.head.appendChild(TryNot_CSS);
+        document.body.appendChild(TryNot_HTML);
+
+        return {
+            elements: Elements,
+            state: {
+                isOpen: false,
+            },
+            variate: {
+                defaultTitle: "TryNotScript",
+                page: "page",
+                timeId: null,
+            },
+            timedMessage: function (msg, time = 3000) {
+                const ScriptTitle = this.elements.ScriptTitle;
+
+                ScriptTitle.innerHTML = `<p>${msg}</p>`;
+                ScriptTitle.style.width = "128px";
+                ScriptTitle.style.padding = "0px 8px";
+
+                if (this.variate.timeId) clearTimeout(this.variate.timeId);
+
+                this.variate.timeId = setTimeout(() => {
+                    ScriptTitle.innerHTML = `<p>${this.variate.defaultTitle}</p>`;
+
+                    if (this.state.isOpen) return;
+
+                    ScriptTitle.style.width = "0px";
+                    ScriptTitle.style.padding = "0px 0px";
+                }, time);
+            },
+            switchTryNot: function () {
+                this.state.isOpen = !this.state.isOpen;
+
+                const ScriptBox = this.elements.ScriptBox;
+                const ScriptTitle = this.elements.ScriptTitle;
+
+                if (this.state.isOpen) {
+                    ScriptBox.style.height = "150px";
+                    ScriptBox.style.padding = "6px 8px";
+                    ScriptTitle.style.width = "128px";
+                    ScriptTitle.style.padding = "0px 8px";
+                } else {
+                    ScriptBox.style.height = "0px";
+                    ScriptBox.style.padding = "0px 8px";
+                    ScriptTitle.style.width = "0px";
+                    ScriptTitle.style.padding = "0px 0px";
+                }
+            },
+            updataTitle(title, page = null) {
+                this.variate.defaultTitle = title;
+                if (page) this.variate.page = page;
+                this.elements.ScriptTitle.innerHTML = `<p>${this.variate.defaultTitle}</p>`;
+                this.elements.PageNumber.innerHTML = `<p>${this.variate.page}</p>`;
+            },
+        };
+    }
+
+    const TryNot = CreateTryNot();
+
     const Tool = {
         elementArrayForRemove: function (RemoveArray) {
             if (!Array.isArray(RemoveArray)) throw new Error("RemoveArray参数错误");
@@ -47,106 +135,21 @@
         }
     };
 
-    const TryNot = new (class {
-        Elements;
-        #title = "TryNotScript";
-        #page = "page";
-        #switch = false;
-        #TimeId;
-        constructor() {
-            const is_CSS = GM_getResourceText("CSS");
-            const is_HTML = GM_getResourceText("HTML");
-
-            if (!is_CSS || !is_HTML) throw new Error("资源加载失败");
-
-            const TryNot_CSS = document.createElement("style");
-            const TryNot_HTML = document.createElement("div");
-
-            TryNot_CSS.innerHTML = is_CSS;
-            TryNot_HTML.innerHTML = is_HTML;
-
-            document.body.appendChild(TryNot_CSS);
-            document.body.appendChild(TryNot_HTML);
-
-            const Elements = {
-                TryNotScript: TryNot_HTML.querySelector(".TryNotScript"),
-                TryNotButton: TryNot_HTML.querySelector(".TopBar_Button"),
-                ScriptTitle: TryNot_HTML.querySelector(".TopBar_Title"),
-                ScriptBox: TryNot_HTML.querySelector(".MainBox"),
-                ScriptFunction: TryNot_HTML.querySelector(".MainBox_Main"),
-                previousPage: TryNot_HTML.querySelector(".CutPage_Next"),
-                NextPage: TryNot_HTML.querySelector(".CutPage_To"),
-                RemoveAD: TryNot_HTML.querySelector(".RemoveAD"),
-                ScriptSetting: TryNot_HTML.querySelector(".MainBox_Bottom"),
-                Setting: TryNot_HTML.querySelector(".Setting_Button"),
-                PageNumber: TryNot_HTML.querySelector(".PageNumber"),
-            };
-
-            if (Object.values(Elements).some((v) => v === null)) throw new Error("元素加载失败");
-
-            this.Elements = Elements;
-        }
-        #switchTitle(visible){
-            const ScriptTitle = this.Elements.ScriptTitle;
-            if (visible) {
-                ScriptTitle.style.width = "128px";
-                ScriptTitle.style.padding = "0px 8px";
-            } else {
-                if(this.#switch) return;
-                ScriptTitle.style.width = "0px";
-                ScriptTitle.style.padding = "0px 0px";
-            }
-        }
-        #switchMain(visible){
-            const ScriptBox = this.Elements.ScriptBox;
-            if(visible){
-                ScriptBox.style.height = "150px";
-                ScriptBox.style.padding = "6px 8px";
-                this.#switch = true;
-            }else{
-                ScriptBox.style.height = "0px";
-                ScriptBox.style.padding = "0px 8px";
-                this.#switch = false;
-            }
-            this.#switchTitle(visible);
-        }
-        timedMessage(Message) {
-            if (this.#TimeId) clearTimeout(this.#TimeId);
-
-            this.Elements.ScriptTitle.innerHTML = `<p>${Message}</p>`;
-            this.#switchTitle(true);
-
-            this.#TimeId = setTimeout(() => {
-                if (!this.#switch) this.#switchTitle(false);
-                this.Elements.ScriptTitle.innerHTML = `<p>${this.#title}</p>`;
-            }, 3000);
-        }
-        switchTryNot() {
-            this.#switchMain(!this.#switch);
-        }
-        updataTitle(title, page = null) {
-            this.#title = title;
-            if (page) this.#page = page;
-            this.Elements.ScriptTitle.innerHTML = `<p>${this.#title}</p>`;
-            TryNot.Elements.PageNumber.innerHTML = `<p>${this.#page}</p>`;
-        }
-    })();
-
-    TryNot.Elements.TryNotButton.addEventListener("click", () => {
+    TryNot.elements.TryNotButton.addEventListener("click", () => {
         TryNot.switchTryNot();
     });
 
-    TryNot.Elements.previousPage.addEventListener("click", () => {
+    TryNot.elements.previousPage.addEventListener("click", () => {
         TryNot.timedMessage("即将跳转");
         Tool.safeCallPageFunction("getNearByChapter", 0);
     });
 
-    TryNot.Elements.NextPage.addEventListener("click", () => {
+    TryNot.elements.NextPage.addEventListener("click", () => {
         TryNot.timedMessage("即将跳转");
         Tool.safeCallPageFunction("getNearByChapter", 1);
     });
 
-    TryNot.Elements.RemoveAD.addEventListener("click", () => {
+    TryNot.elements.RemoveAD.addEventListener("click", () => {
         Tool.elementArrayForRemove([
             document.querySelector(".loginbackwrap"),
             document.querySelector(".div_sticky2"),
@@ -155,8 +158,8 @@
             ...document.querySelectorAll(".mhFootHint"),
             ...document.querySelectorAll(".actions-group"),
             ...document.querySelectorAll(".qt_lkphn"),
-            ...document.querySelectorAll(".wpvwcwve"),
-            ...document.querySelectorAll('.pgwalqmn'),
+            ...document.querySelectorAll("div[data-type='1']"),
+            ...document.querySelectorAll("iframe"),
         ]);
 
         TryNot.timedMessage("已清除广告");
@@ -171,6 +174,6 @@
         TryNot.updataTitle(titleArray[0] || "TryNotScript", titleArray[1]);
     }
 
-    TryNot.Elements.TryNotScript.style.display = "block";
-    TryNot.Elements.RemoveAD.click();
+    TryNot.elements.TryNotScript.style.display = "block";
+    TryNot.elements.RemoveAD.click();
 })();

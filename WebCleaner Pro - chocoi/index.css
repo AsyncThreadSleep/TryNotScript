@@ -11,12 +11,12 @@
 .TryNotScript{
     width: 200px;
     height: 200px;
+    display: none;
     position: absolute;
     top: 6px;
     left: 8px;
     z-index: 9999993;
     overflow: hidden;
-
 }
 
 .TopBar{
