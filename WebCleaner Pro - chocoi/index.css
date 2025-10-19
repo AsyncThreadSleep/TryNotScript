@@ -113,8 +113,7 @@
     justify-content: space-between;
 }
 
-.CutPage_Next,
-.CutPage_To{
+.CutPage_Content{
     width: 47%;
     border-radius: 8px;
     border: 1px solid rgb(0, 0, 0);

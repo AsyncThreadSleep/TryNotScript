@@ -3,7 +3,7 @@
 // @author       TryNot
 // @namespace    https://github.com/AsyncThreadSleep
 // @homepage     https://github.com/AsyncThreadSleep/TryNotScript
-// @version      251009
+// @version      251018
 // @description  适用于iphone 6s safari浏览器的chocoi.net漫画阅读器脚本
 // @run-at       document-end
 // @match        https://chocoi.net/*
@@ -48,6 +48,10 @@
             ScriptFunction: TryNot_HTML.querySelector(".MainBox_Main"),
             previousPage: TryNot_HTML.querySelector(".CutPage_Next"),
             NextPage: TryNot_HTML.querySelector(".CutPage_To"),
+            CutPage_Back: TryNot_HTML.querySelector(".CutPage_Back"),
+            CutPage_Forward: TryNot_HTML.querySelector(".CutPage_Forward"),
+            BackHome: TryNot_HTML.querySelector(".BackHome"),
+            ForceRefresh: TryNot_HTML.querySelector(".ForceRefresh"),
             RemoveAD: TryNot_HTML.querySelector(".RemoveAD"),
             ScriptSetting: TryNot_HTML.querySelector(".MainBox_Bottom"),
             Setting: TryNot_HTML.querySelector(".Setting_Button"),
@@ -147,6 +151,22 @@
     TryNot.elements.NextPage.addEventListener("click", () => {
         TryNot.timedMessage("即将跳转");
         Tool.safeCallPageFunction("getNearByChapter", 1);
+    });
+
+    TryNot.elements.CutPage_Back.addEventListener("click", () => {
+        window.history.back();
+    });
+
+    TryNot.elements.CutPage_Forward.addEventListener("click", () => {
+        window.history.forward();
+    });
+
+    TryNot.elements.BackHome.addEventListener("click", () => {
+        window.location.href = "https://chocoi.net/home";
+    });
+
+    TryNot.elements.ForceRefresh.addEventListener("click", () => {
+        window.location.reload(true);
     });
 
     TryNot.elements.RemoveAD.addEventListener("click", () => {
